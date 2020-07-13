@@ -11,50 +11,75 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-   private static Connection connection = Util.getMysqlConnection ();
+    private static Connection connection = Util.getMysqlConnection ();
 
 
-    public void createUsersTable()  {
-        try(Statement stmt = connection.createStatement()) {
+    public void createUsersTable() {
+        try (Statement stmt = connection.createStatement ()) {
+            connection.setAutoCommit (false);
             stmt.execute ("create table if not exists users (id bigint auto_increment," + " name varchar(256), last_name varchar(256), age bigint, primary key (id))");
-        }catch (Exception ex){
-            ex.printStackTrace ();
+            connection.commit ();
+        } catch (Exception ex) {
+            try {
+                connection.rollback ();
+                connection.setAutoCommit (true);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace ();
+            }
         }
     }
 
     public void dropUsersTable() {
-        try(Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("DROP TABLE IF EXISTS users ");
-        }catch (Exception ex){
-            ex.printStackTrace ();
+        try (Statement stmt = connection.createStatement ()) {
+            connection.setAutoCommit (false);
+            stmt.executeUpdate ("DROP TABLE IF EXISTS users ");
+            connection.commit ();
+        } catch (Exception ex) {
+            try {
+                connection.rollback ();
+                connection.setAutoCommit (true);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace ();
+            }
         }
-
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        try(Statement stmt = connection.createStatement()) {
-            stmt.execute("create table if not exists users (id bigint auto_increment," + " name varchar(256), last_name varchar(256), age bigint, primary key (id))");
-            stmt.execute ("INSERT INTO users SET name = '"+ name + "',"+"  last_name = "+"'"+ lastName +"', " +" age = "+ age);
-        }catch (Exception ex){
-            ex.printStackTrace ();
+        try (Statement stmt = connection.createStatement ()) {
+            connection.setAutoCommit (false);
+            stmt.execute ("create table if not exists users (id bigint auto_increment," + " name varchar(256), last_name varchar(256), age bigint, primary key (id))");
+            stmt.execute ("INSERT INTO users SET name = '" + name + "'," + "  last_name = " + "'" + lastName + "', " + " age = " + age);
+        } catch (Exception ex) {
+            try {
+                connection.rollback ();
+                connection.setAutoCommit (true);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace ();
+            }
         }
     }
 
     public void removeUserById(long id) {
-        try(Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate("DELETE FROM users WHERE id =" + id +"");
-        }catch (Exception ex){
-            ex.printStackTrace ();
+        try (Statement stmt = connection.createStatement ()) {
+            connection.setAutoCommit (false);
+            stmt.executeUpdate ("DELETE FROM users WHERE id =" + id + "");
+            connection.commit ();
+        } catch (Exception ex) {
+            try {
+                connection.rollback ();
+                connection.setAutoCommit (true);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace ();
+            }
         }
-
     }
 
     public List<User> getAllUsers() {
-        List <User> userList = new ArrayList<> ();
+        List<User> userList = new ArrayList<> ();
         try (Statement stmt = connection.createStatement ()) {
             stmt.execute ("create table if not exists users (id bigint auto_increment, name varchar(256), last_name varchar(256), age bigint, primary key (id))");
             ResultSet resultSet = stmt.executeQuery ("SELECT * FROM users");
-            while (resultSet.next ()){
+            while (resultSet.next ()) {
                 User user = new User ();
                 user.setId (resultSet.getLong (1));
                 user.setName (resultSet.getString (2));
@@ -69,12 +94,19 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        try(Statement stmt = connection.createStatement()) {
-            stmt.execute("create table if not exists users (id bigint auto_increment, name varchar(256), last_name varchar(256), age bigint, primary key (id))");
-            stmt.executeUpdate("TRUNCATE TABLE users");
-        }catch (Exception ex){
-            ex.printStackTrace ();
+        try (Statement stmt = connection.createStatement ()) {
+            connection.setAutoCommit (false);
+            stmt.execute ("create table if not exists users (id bigint auto_increment, name varchar(256), last_name varchar(256), age bigint, primary key (id))");
+            stmt.executeUpdate ("TRUNCATE TABLE users");
+            connection.commit ();
+        } catch (Exception ex) {
+            try {
+                connection.rollback ();
+                connection.setAutoCommit (true);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace ();
+            }
         }
-
     }
 }
+

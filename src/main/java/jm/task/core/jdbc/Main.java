@@ -9,7 +9,7 @@ import jm.task.core.jdbc.service.UserServiceImpl;
 
 public class Main {
     public static void main(String[] args) {
-        UserServiceImpl userService = new UserServiceImpl (  new UserDaoJDBCImpl ());
+        UserServiceImpl userService = new UserServiceImpl (new UserDaoHibernateImpl ());
         userService.createUsersTable ();
         userService.saveUser ("Пётр","Сидоров", (byte) 18);
         System.out.println ("User с именем – Пётр добавлен в базу данных");
